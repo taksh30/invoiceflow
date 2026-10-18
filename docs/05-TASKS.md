@@ -4,7 +4,7 @@ Legend: [ ] todo  [~] in progress  [x] done
 
 ## Phases
 - [x] P1  Scaffold, tooling, config, logging
-- [ ] P2  Domain models + utils (money, dates)
+- [x] P2  Domain models + utils (money, dates)
 - [ ] P3  Database layer + repositories
 - [ ] P4  Folder source + ingest (hashing, storage)
 - [ ] P5  Classification + text extraction (pdfplumber, OCR)
@@ -18,11 +18,12 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [ ] P13 Advanced (LLM fallback, review UI, Tally/QuickBooks, Postgres)
 
 ## Current phase
-P2
+P3
 
 ## Session Log
 - P1 complete: Configured project tooling, pyproject.toml, .gitignore, .env.example, config.py, utils/logging.py, errors.py, empty Typer CLI, .pre-commit-config.yaml, and smoke/unit tests (10/10 passing, 95% coverage).
-- Next: P2 Domain models + utils (money, dates).
+- P2 complete: Implemented domain models (RawDocument, FieldResult, ExtractedInvoice with Pydantic v2 validators and StrEnums), money parser (supporting Indian, US, and EU formatting, OCR fixes, and scale enforcement), and date parser (handling locale ambiguity and date sanity). 32 tests passing, 94% coverage.
+- Next: P3 Database layer + repositories.
 
 ## Open Questions / Decisions
 (none yet)
