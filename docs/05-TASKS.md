@@ -10,7 +10,7 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [x] P5  Classification + text extraction (pdfplumber, OCR)
 - [x] P6  Field extractors + rule files
 - [x] P7  Validation + confidence scoring
-- [ ] P8  Duplicate detection
+- [x] P8  Duplicate detection
 - [ ] P9  Pipeline orchestration + CLI
 - [ ] P10 Email (IMAP) source
 - [ ] P11 Exports (CSV/XLSX + Google Sheets)
@@ -18,7 +18,7 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [ ] P13 Advanced (LLM fallback, review UI, Tally/QuickBooks, Postgres)
 
 ## Current phase
-P8
+P9
 
 ## Session Log
 - P1 complete: Configured project tooling, pyproject.toml, .gitignore, .env.example, config.py, utils/logging.py, errors.py, empty Typer CLI, .pre-commit-config.yaml, and smoke/unit tests (10/10 passing, 95% coverage).
@@ -28,7 +28,8 @@ P8
 - P5 complete: Implemented classify_document, TextResult and WordBox models, pdfplumber digital extraction, Pillow image preprocessing, and pypdfium2 + pytesseract OCR. Added 3 fixtures and verified OCR tests. 55 tests passing, 96% coverage.
 - P6 complete: Implemented modular FieldExtractors and YAML rule configuration for total, subtotal, tax/GST splits, invoice number, date, vendor, tax ID, and currency. Generated 30 benchmark fixtures with ground-truth expected JSON. Evaluation report passed all DoD thresholds (100% total, 100% date, 100% vendor, 97% invoice number). 66 tests passing, 93% coverage.
 - P7 complete: Implemented validate.py with ValidationResult, subtotal + tax arithmetic cross-checks (tolerance <= 1.00 boosts confidence +0.05, diff > 1.00 flags needs_review), GST split consistency, key field presence and confidence threshold rules (< 0.60 flags needs_review), and build_and_validate helper. 77 tests passing, 93% coverage.
-- Next: P8 Duplicate detection.
+- P8 complete: Implemented dedupe.py with normalize_vendor, vendor_similarity via rapidfuzz, find_duplicate comparing normalized vendor (>= 90% similarity), invoice number, total, and date, marking duplicate_of and status=duplicate. Tested exact matches, re-scanned copies, near-misses, and missing numbers. 87 tests passing, 94% coverage.
+- Next: P9 Pipeline orchestration + CLI.
 
 ## Open Questions / Decisions
 (none yet)

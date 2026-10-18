@@ -98,6 +98,11 @@ class InvoiceRepository:
             else:
                 conditions.append(and_(v_match, t_match))
 
+        if total is not None and invoice_date is not None:
+            conditions.append(
+                and_(InvoiceRow.total == total, InvoiceRow.invoice_date == invoice_date)
+            )
+
         if not conditions:
             return []
 
