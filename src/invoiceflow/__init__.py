@@ -6,6 +6,7 @@ from invoiceflow.dedupe import (
     normalize_vendor,
     vendor_similarity,
 )
+from invoiceflow.export import GoogleSheetsExporter, export_monthly_data
 from invoiceflow.pipeline import Pipeline, PipelineResult
 from invoiceflow.sources.email_imap import ImapEmailSource
 from invoiceflow.validate import ValidationResult, build_and_validate, validate_invoice
@@ -13,11 +14,13 @@ from invoiceflow.validate import ValidationResult, build_and_validate, validate_
 __version__ = "0.1.0"
 __all__ = [
     "DeduplicationResult",
+    "GoogleSheetsExporter",
     "ImapEmailSource",
     "Pipeline",
     "PipelineResult",
     "ValidationResult",
     "build_and_validate",
+    "export_monthly_data",
     "find_duplicate",
     "normalize_vendor",
     "validate_invoice",

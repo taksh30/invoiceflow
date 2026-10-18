@@ -22,6 +22,9 @@ dependencies = [
     "alembic>=1.13.0",
     "pyyaml>=6.0.1",
     "rapidfuzz>=3.8.0",
+    "openpyxl>=3.1.0",
+    "google-api-python-client>=2.120.0",
+    "google-auth>=2.29.0",
 ]
 
 [project.optional-dependencies]
@@ -69,8 +72,21 @@ module = [
     "pypdfium2",
     "PIL",
     "PIL.*",
+    "openpyxl",
+    "openpyxl.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "google.*",
+    "googleapiclient.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "invoiceflow.export.sheets"
+disallow_untyped_calls = false
 
 [tool.pytest.ini_options]
 minversion = "8.0"

@@ -180,3 +180,52 @@ def test_cli_poll_email_no_documents(cli_env: Path, monkeypatch: pytest.MonkeyPa
     assert res.exit_code == 0
     assert "Connecting to IMAP" in res.output
     assert "No unseen invoices or attachments found" in res.output
+
+
+def test_cli_export_validation_errors(cli_env: Path) -> None:
+    """Verify export command validates month string and format options."""
+    res_bad_month = runner.invoke(app, ["export", "--month", "2024/05"])
+    assert res_bad_month.exit_code == 1
+    assert "Invalid month format" in res_bad_month.output
+
+    res_bad_fmt = runner.invoke(app, ["export", "--month", "2024-05", "--format", "pdf"])
+    assert res_bad_fmt.exit_code == 1
+    assert "Unsupported format" in res_bad_fmt.output
+
+
+def test_cli_export_xlsx_and_csv(cli_env: Path) -> None:
+    """Verify exporting monthly records to XLSX and CSV via CLI."""
+    sample_file = FIXTURES_DIR / "inv_in_01.pdf"
+    runner.invoke(app, ["process", str(sample_file)])
+
+    res_xlsx = runner.invoke(app, ["export", "--month", "2024-05", "--format", "xlsx"])
+    assert res_xlsx.exit_code == 0
+    assert "Successfully exported 1 invoices" in res_xlsx.output
+
+    res_csv = runner.invoke(app, ["export", "--month", "2024-05", "--format", "csv"])
+    assert res_csv.exit_code == 0
+    assert "Successfully exported 1 invoices" in res_csv.output
+
+
+def test_cli_export_sheets(cli_env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify Google Sheets export handling missing config and successful sync."""
+    sample_file = FIXTURES_DIR / "inv_in_01.pdf"
+    runner.invoke(app, ["process", str(sample_file)])
+
+    # 1. Missing credentials
+    res_missing = runner.invoke(app, ["export", "--month", "2024-05", "--format", "sheets"])
+    assert res_missing.exit_code == 1
+    assert "Missing Google Sheets configuration" in res_missing.output
+
+    # 2. Configured credentials with mocked sync
+    monkeypatch.setenv("INVOICEFLOW_GOOGLE_SHEETS_SPREADSHEET_ID", "mock_sheet_id_123")
+    monkeypatch.setenv("INVOICEFLOW_GOOGLE_SERVICE_ACCOUNT_FILE", "mock_sa.json")
+
+    with patch(
+        "invoiceflow.export.sheets.GoogleSheetsExporter.sync_invoices",
+        return_value=1,
+    ):
+        res_sync = runner.invoke(app, ["export", "--month", "2024-05", "--format", "sheets"])
+
+    assert res_sync.exit_code == 0
+    assert "Successfully synced 1 new invoices to Google Sheets" in res_sync.output

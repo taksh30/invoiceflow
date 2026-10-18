@@ -34,7 +34,18 @@ class Settings(BaseSettings):
     imap_password: str | None = Field(default=None, description="IMAP account password")
     imap_folder: str = Field(default="INBOX", description="IMAP mailbox folder")
 
+    export_dir: Path = Field(
+        default=Path("data/exports"), description="Default directory for exported reports"
+    )
+    google_service_account_file: Path | None = Field(
+        default=None, description="Path to Google service account credentials JSON"
+    )
+    google_sheets_spreadsheet_id: str | None = Field(
+        default=None, description="Target Google Sheets spreadsheet ID"
+    )
+
     def ensure_directories(self) -> None:
         """Create necessary data storage directories if they do not exist."""
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.raw_dir.mkdir(parents=True, exist_ok=True)
+        self.export_dir.mkdir(parents=True, exist_ok=True)

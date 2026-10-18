@@ -28,5 +28,9 @@ repos:
           - types-PyYAML>=6.0.12
           - rapidfuzz>=3.8.0
           - tenacity>=8.3.0
+          - openpyxl>=3.1.0
+          - pandas-stubs>=2.2.0
+          - google-api-python-client>=2.120.0
+          - google-auth>=2.29.0
         args: [--strict]
         files: ^src/
