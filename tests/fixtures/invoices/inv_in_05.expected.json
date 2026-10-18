@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Zomato Limited",
+  "invoice_number": "ZOM-4512",
+  "invoice_date": "2024-05-18",
+  "currency": "INR",
+  "subtotal": "450.00",
+  "tax_total": "22.50",
+  "total": "472.50",
+  "vendor_tax_id": "07AAACZ1122K1Z9"
+}

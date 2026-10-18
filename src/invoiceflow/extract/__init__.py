@@ -1,6 +1,18 @@
 """Document extraction and classification components."""
 
 from invoiceflow.extract.classify import classify_document
+from invoiceflow.extract.fields import (
+    CurrencyExtractor,
+    FieldExtractor,
+    InvoiceDateExtractor,
+    InvoiceFieldsExtractor,
+    InvoiceNumberExtractor,
+    SubtotalExtractor,
+    TaxExtractor,
+    TotalExtractor,
+    VendorNameExtractor,
+    VendorTaxIdExtractor,
+)
 from invoiceflow.extract.text import (
     TextResult,
     WordBox,
@@ -20,4 +32,14 @@ __all__ = [
     "preprocess_image",
     "TextResult",
     "WordBox",
+    "FieldExtractor",
+    "TotalExtractor",
+    "SubtotalExtractor",
+    "TaxExtractor",
+    "InvoiceNumberExtractor",
+    "InvoiceDateExtractor",
+    "VendorNameExtractor",
+    "VendorTaxIdExtractor",
+    "CurrencyExtractor",
+    "InvoiceFieldsExtractor",
 ]

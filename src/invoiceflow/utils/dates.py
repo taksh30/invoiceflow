@@ -28,7 +28,7 @@ def parse_date(raw_value: str, locale: str = "IN") -> date:
     except (ValueError, TypeError):
         pass
 
-    day_first = locale.upper() == "IN"
+    day_first = locale.upper() != "US"
     try:
         dt = parser.parse(cleaned, dayfirst=day_first, fuzzy=False)
     except (parser.ParserError, OverflowError, ValueError) as err:

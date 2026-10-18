@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Amazon Web Services Inc",
+  "invoice_number": "AWS-99120",
+  "invoice_date": "2024-05-10",
+  "currency": "USD",
+  "subtotal": "150.00",
+  "tax_total": "12.00",
+  "total": "162.00",
+  "vendor_tax_id": null
+}

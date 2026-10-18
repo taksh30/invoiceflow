@@ -1,0 +1,10 @@
+{
+  "vendor_name": "HDFC Bank Ltd",
+  "invoice_number": "HDFC-332",
+  "invoice_date": "2024-05-01",
+  "currency": "INR",
+  "subtotal": "2000.00",
+  "tax_total": "360.00",
+  "total": "2360.00",
+  "vendor_tax_id": "27AAACH1111Q1Z2"
+}

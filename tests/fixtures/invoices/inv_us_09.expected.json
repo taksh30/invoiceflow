@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Twilio Inc",
+  "invoice_number": "TW-1140",
+  "invoice_date": "2024-05-05",
+  "currency": "USD",
+  "subtotal": "85.50",
+  "tax_total": "6.84",
+  "total": "92.34",
+  "vendor_tax_id": null
+}

@@ -8,7 +8,7 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [x] P3  Database layer + repositories
 - [x] P4  Folder source + ingest (hashing, storage)
 - [x] P5  Classification + text extraction (pdfplumber, OCR)
-- [ ] P6  Field extractors + rule files
+- [x] P6  Field extractors + rule files
 - [ ] P7  Validation + confidence scoring
 - [ ] P8  Duplicate detection
 - [ ] P9  Pipeline orchestration + CLI
@@ -18,7 +18,7 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [ ] P13 Advanced (LLM fallback, review UI, Tally/QuickBooks, Postgres)
 
 ## Current phase
-P6
+P7
 
 ## Session Log
 - P1 complete: Configured project tooling, pyproject.toml, .gitignore, .env.example, config.py, utils/logging.py, errors.py, empty Typer CLI, .pre-commit-config.yaml, and smoke/unit tests (10/10 passing, 95% coverage).
@@ -26,7 +26,8 @@ P6
 - P3 complete: Implemented SQLAlchemy 2.0 tables (DocumentRow, InvoiceRow, ProcessingEventRow), InvoiceRepository (add_document, get_by_hash, add_invoice, find_candidates, list_by_month, log_event), and Alembic setup. 38 tests passing, 95% coverage.
 - P4 complete: Implemented FolderSource (scanning, polling watcher, .pdf/.jpg/.jpeg/.png filter, seen tracking) and IngestionService (SHA-256 computation, raw file persistence, DB registration, idempotency on hash match). 46 tests passing, 96% coverage.
 - P5 complete: Implemented classify_document, TextResult and WordBox models, pdfplumber digital extraction, Pillow image preprocessing, and pypdfium2 + pytesseract OCR. Added 3 fixtures and verified OCR tests. 55 tests passing, 96% coverage.
-- Next: P6 Field extractors + rule files.
+- P6 complete: Implemented modular FieldExtractors and YAML rule configuration for total, subtotal, tax/GST splits, invoice number, date, vendor, tax ID, and currency. Generated 30 benchmark fixtures with ground-truth expected JSON. Evaluation report passed all DoD thresholds (100% total, 100% date, 100% vendor, 97% invoice number). 66 tests passing, 93% coverage.
+- Next: P7 Validation + confidence scoring.
 
 ## Open Questions / Decisions
 (none yet)

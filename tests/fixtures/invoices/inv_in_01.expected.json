@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Reliance Retail Ltd",
+  "invoice_number": "INV/2024/001",
+  "invoice_date": "2024-05-15",
+  "currency": "INR",
+  "subtotal": "1000.00",
+  "tax_total": "180.00",
+  "total": "1180.00",
+  "vendor_tax_id": "27AAACR1234F1Z5"
+}

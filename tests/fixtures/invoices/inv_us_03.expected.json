@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Microsoft Corporation",
+  "invoice_number": "MSFT-883",
+  "invoice_date": "2024-05-01",
+  "currency": "USD",
+  "subtotal": "1200.00",
+  "tax_total": "96.00",
+  "total": "1296.00",
+  "vendor_tax_id": null
+}

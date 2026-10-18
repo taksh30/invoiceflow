@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Schneider Electric",
+  "invoice_number": "SCH-662",
+  "invoice_date": "2024-05-28",
+  "currency": "EUR",
+  "subtotal": "3200.00",
+  "tax_total": "640.00",
+  "total": "3840.00",
+  "vendor_tax_id": "FR12345678901"
+}

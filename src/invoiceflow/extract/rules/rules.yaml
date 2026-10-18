@@ -1,0 +1,108 @@
+# Default field extraction rules and anchor patterns
+total:
+  anchors:
+    - "grand total"
+    - "total amount"
+    - "amount due"
+    - "net payable"
+    - "balance due"
+    - "total due"
+    - "total"
+  confidence_anchored: 0.9
+  confidence_fallback: 0.4
+
+subtotal:
+  anchors:
+    - "subtotal"
+    - "sub total"
+    - "taxable value"
+    - "net amount"
+    - "base amount"
+  confidence_anchored: 0.9
+  confidence_fallback: 0.5
+
+tax:
+  anchors:
+    - "tax amount"
+    - "total tax"
+    - "tax"
+    - "vat"
+    - "gst"
+  cgst_anchors:
+    - "cgst"
+    - "central gst"
+  sgst_anchors:
+    - "sgst"
+    - "state gst"
+  igst_anchors:
+    - "igst"
+    - "integrated gst"
+  confidence_anchored: 0.9
+
+invoice_number:
+  anchors:
+    - "invoice no"
+    - "invoice #"
+    - "inv #"
+    - "inv no"
+    - "bill no"
+    - "bill #"
+    - "receipt no"
+    - "receipt #"
+    - "tax invoice no"
+  pattern: '(?i)(?:[A-Z0-9]+[/-])*[A-Z0-9]{3,25}'
+  confidence_anchored: 0.9
+  confidence_unanchored: 0.6
+
+invoice_date:
+  anchors:
+    - "invoice date"
+    - "bill date"
+    - "date of issue"
+    - "receipt date"
+    - "date"
+    - "dated"
+  confidence_anchored: 0.9
+  confidence_unanchored: 0.6
+
+vendor_tax_id:
+  gstin_pattern: '\b\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]\b'
+  vat_pattern: '\b[A-Z]{2}[0-9A-Z]{8,12}\b'
+  confidence_pattern: 0.9
+
+vendor_name:
+  max_header_lines: 8
+  skip_keywords:
+    - "tax invoice"
+    - "invoice"
+    - "bill to"
+    - "ship to"
+    - "customer"
+    - "date"
+    - "total"
+    - "subtotal"
+    - "gstin"
+    - "phone"
+    - "tel"
+    - "email"
+    - "address"
+    - "cin"
+    - "pan"
+    - "original for recipient"
+  confidence_top_line: 0.9
+  confidence_fallback: 0.5
+
+currency:
+  symbol_map:
+    "₹": "INR"
+    "rs.": "INR"
+    "rs": "INR"
+    "inr": "INR"
+    "$": "USD"
+    "usd": "USD"
+    "€": "EUR"
+    "eur": "EUR"
+    "£": "GBP"
+    "gbp": "GBP"
+  default_currency: "INR"
+  confidence: 0.9

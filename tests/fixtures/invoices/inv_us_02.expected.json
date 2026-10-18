@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Google LLC",
+  "invoice_number": "GGL-4410",
+  "invoice_date": "2024-05-15",
+  "currency": "USD",
+  "subtotal": "500.00",
+  "tax_total": "40.00",
+  "total": "540.00",
+  "vendor_tax_id": null
+}

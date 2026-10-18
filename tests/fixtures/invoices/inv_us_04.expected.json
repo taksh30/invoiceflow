@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Stripe Inc",
+  "invoice_number": "STR-2210",
+  "invoice_date": "2024-05-18",
+  "currency": "USD",
+  "subtotal": "75.00",
+  "tax_total": "0.00",
+  "total": "75.00",
+  "vendor_tax_id": null
+}

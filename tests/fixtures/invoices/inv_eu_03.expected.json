@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Siemens AG",
+  "invoice_number": "SIE-1102",
+  "invoice_date": "2024-05-20",
+  "currency": "EUR",
+  "subtotal": "18500.00",
+  "tax_total": "3515.00",
+  "total": "22015.00",
+  "vendor_tax_id": "DE987654321"
+}

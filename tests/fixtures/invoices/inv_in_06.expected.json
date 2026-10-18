@@ -1,0 +1,10 @@
+{
+  "vendor_name": "Swiggy India",
+  "invoice_number": "SWG-1102",
+  "invoice_date": "2024-05-22",
+  "currency": "INR",
+  "subtotal": "600.00",
+  "tax_total": "30.00",
+  "total": "630.00",
+  "vendor_tax_id": "29AABCS8899D1Z3"
+}

@@ -105,10 +105,10 @@ def extract_from_image(source: Path | bytes | Image.Image, page_number: int = 1)
             )
         )
 
-    full_text = " ".join(page_tokens)
+    raw_text = pytesseract.image_to_string(processed).strip()
     return TextResult(
-        raw_text=full_text,
-        pages=[full_text],
+        raw_text=raw_text,
+        pages=[raw_text],
         words=words,
         method="tesseract_ocr",
     )

@@ -1,0 +1,10 @@
+{
+  "vendor_name": "SAP SE",
+  "invoice_number": "SAP-4410",
+  "invoice_date": "2024-05-10",
+  "currency": "EUR",
+  "subtotal": "2500.00",
+  "tax_total": "475.00",
+  "total": "2975.00",
+  "vendor_tax_id": "DE123456789"
+}
