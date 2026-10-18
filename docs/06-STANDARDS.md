@@ -1,0 +1,11 @@
+# Coding Standards
+- Python 3.12, full type hints, mypy strict on src/
+- ruff for lint + format, line length 100
+- Small functions (<40 lines), single responsibility
+- Domain errors: InvoiceFlowError -> IngestError, ExtractionError, ValidationError
+- Never use bare except; log with context (document_id, stage)
+- Use pathlib, not os.path. Use Decimal for money.
+- Logging: stdlib logging, JSON optional; no print() in src/
+- No global state; pass dependencies explicitly (config, session)
+- Docstrings: one line unless behavior is non-obvious
+- Commits: conventional commits (feat:, fix:, test:, docs:, chore:)
