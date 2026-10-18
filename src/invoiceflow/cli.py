@@ -14,6 +14,7 @@ from invoiceflow.db.base import create_db_engine, get_session_factory, init_db
 from invoiceflow.db.repository import InvoiceRepository
 from invoiceflow.db.tables import DocumentRow, InvoiceRow, ProcessingEventRow
 from invoiceflow.pipeline import Pipeline, PipelineResult
+from invoiceflow.sources.email_imap import ImapEmailSource
 from invoiceflow.sources.folder import FolderSource
 
 app = typer.Typer(
@@ -106,6 +107,47 @@ def watch_command(
             _render_results_table([result])
     except KeyboardInterrupt:
         console.print("\n[yellow]Watch mode stopped.[/yellow]")
+    finally:
+        session.close()
+
+
+@app.command(name="poll-email")
+def poll_email_command(
+    folder: Annotated[str | None, typer.Option(help="Override IMAP mailbox folder to poll")] = None,
+    locale: Annotated[str, typer.Option(help="Default country locale (IN, US, EU)")] = "IN",
+) -> None:
+    """Poll configured IMAP mailbox over SSL for new invoice attachments."""
+    settings = Settings()
+    if not settings.imap_host or not settings.imap_user or not settings.imap_password:
+        console.print(
+            "[red]Error:[/red] Missing IMAP credentials. Configure INVOICEFLOW_IMAP_HOST, "
+            "INVOICEFLOW_IMAP_USER, and INVOICEFLOW_IMAP_PASSWORD in environment or .env file."
+        )
+        raise typer.Exit(code=1)
+
+    mailbox_folder = folder or settings.imap_folder
+    console.print(
+        f"[bold green]Connecting to IMAP:[/bold green] {settings.imap_user}@{settings.imap_host}:"
+        f"{settings.imap_port}/{mailbox_folder}"
+    )
+
+    source = ImapEmailSource(
+        host=settings.imap_host,
+        port=settings.imap_port,
+        user=settings.imap_user,
+        password=settings.imap_password,
+        folder=mailbox_folder,
+    )
+
+    pipeline, _, session = _get_pipeline(locale)
+    try:
+        raw_docs = source.fetch_documents()
+        if not raw_docs:
+            console.print("[yellow]No unseen invoices or attachments found.[/yellow]")
+            return
+
+        results = [pipeline.process_raw_document(doc) for doc in raw_docs]
+        _render_results_table(results)
     finally:
         session.close()
 

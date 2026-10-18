@@ -12,13 +12,13 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [x] P7  Validation + confidence scoring
 - [x] P8  Duplicate detection
 - [x] P9  Pipeline orchestration + CLI
-- [ ] P10 Email (IMAP) source
+- [x] P10 Email (IMAP) source
 - [ ] P11 Exports (CSV/XLSX + Google Sheets)
 - [ ] P12 Hardening (retries, logging, Docker, CI, README)
 - [ ] P13 Advanced (LLM fallback, review UI, Tally/QuickBooks, Postgres)
 
 ## Current phase
-P10
+P11
 
 ## Session Log
 - P1 complete: Configured project tooling, pyproject.toml, .gitignore, .env.example, config.py, utils/logging.py, errors.py, empty Typer CLI, .pre-commit-config.yaml, and smoke/unit tests (10/10 passing, 95% coverage).
@@ -30,7 +30,8 @@ P10
 - P7 complete: Implemented validate.py with ValidationResult, subtotal + tax arithmetic cross-checks (tolerance <= 1.00 boosts confidence +0.05, diff > 1.00 flags needs_review), GST split consistency, key field presence and confidence threshold rules (< 0.60 flags needs_review), and build_and_validate helper. 77 tests passing, 93% coverage.
 - P8 complete: Implemented dedupe.py with normalize_vendor, vendor_similarity via rapidfuzz, find_duplicate comparing normalized vendor (>= 90% similarity), invoice number, total, and date, marking duplicate_of and status=duplicate. Tested exact matches, re-scanned copies, near-misses, and missing numbers. 87 tests passing, 94% coverage.
 - P9 complete: Implemented Pipeline orchestrator (Ingest -> Classify -> Text -> Fields -> Validate -> Dedupe -> Persist with per-document error isolation and audit logging) and Typer CLI commands (process, watch, list, show, reprocess). Added unit and E2E integration tests running all 30 benchmark fixtures; verified zero duplicates on re-run. 103 tests passing, all linters clean.
-- Next: P10 Email (IMAP) source.
+- P10 complete: Implemented ImapEmailSource (SSL connection, UNSEEN message search, RFC 2047 attachment decoding, \\Seen marking, local seen-UID tracking, and tenacity connection retries) and Typer CLI command poll-email. Added 12 unit tests with mocked IMAP server. 115 tests passing, all linters clean.
+- Next: P11 Exports (CSV/XLSX + Google Sheets).
 
 ## Open Questions / Decisions
 (none yet)

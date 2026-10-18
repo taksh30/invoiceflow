@@ -130,3 +130,53 @@ def test_cli_watch_command(cli_env: Path, tmp_path: Path) -> None:
     assert "Watching directory" in res.output
     assert "Watch mode stopped." in res.output
     assert "watch_inv.pdf" in res.output
+
+
+def test_cli_poll_email_missing_credentials(cli_env: Path) -> None:
+    """Verify poll-email fails with code 1 when IMAP settings are not configured."""
+    res = runner.invoke(app, ["poll-email"])
+    assert res.exit_code == 1
+    assert "Missing IMAP credentials" in res.output
+
+
+def test_cli_poll_email_success(cli_env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify poll-email connects, fetches attachments, and processes them."""
+    monkeypatch.setenv("INVOICEFLOW_IMAP_HOST", "imap.mailcorp.com")
+    monkeypatch.setenv("INVOICEFLOW_IMAP_USER", "invoices@mailcorp.com")
+    monkeypatch.setenv("INVOICEFLOW_IMAP_PASSWORD", "secret123")
+
+    email_doc = RawDocument(
+        content=(FIXTURES_DIR / "inv_in_01.pdf").read_bytes(),
+        filename="email_inv.pdf",
+        source=DocumentSource.EMAIL,
+        source_ref="imap://invoices@mailcorp.com@imap.mailcorp.com/INBOX#uid=99&file=email_inv.pdf",
+    )
+
+    with patch(
+        "invoiceflow.sources.email_imap.ImapEmailSource.fetch_documents",
+        return_value=[email_doc],
+    ):
+        res = runner.invoke(app, ["poll-email"])
+
+    assert res.exit_code == 0
+    assert "Connecting to IMAP" in res.output
+    assert "Processing Results" in res.output
+    assert "email_inv.pdf" in res.output
+    assert "Reliance Retail" in res.output
+
+
+def test_cli_poll_email_no_documents(cli_env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verify poll-email outputs friendly message when no unseen invoices exist."""
+    monkeypatch.setenv("INVOICEFLOW_IMAP_HOST", "imap.mailcorp.com")
+    monkeypatch.setenv("INVOICEFLOW_IMAP_USER", "invoices@mailcorp.com")
+    monkeypatch.setenv("INVOICEFLOW_IMAP_PASSWORD", "secret123")
+
+    with patch(
+        "invoiceflow.sources.email_imap.ImapEmailSource.fetch_documents",
+        return_value=[],
+    ):
+        res = runner.invoke(app, ["poll-email"])
+
+    assert res.exit_code == 0
+    assert "Connecting to IMAP" in res.output
+    assert "No unseen invoices or attachments found" in res.output

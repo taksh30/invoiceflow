@@ -7,11 +7,13 @@ from invoiceflow.dedupe import (
     vendor_similarity,
 )
 from invoiceflow.pipeline import Pipeline, PipelineResult
+from invoiceflow.sources.email_imap import ImapEmailSource
 from invoiceflow.validate import ValidationResult, build_and_validate, validate_invoice
 
 __version__ = "0.1.0"
 __all__ = [
     "DeduplicationResult",
+    "ImapEmailSource",
     "Pipeline",
     "PipelineResult",
     "ValidationResult",
