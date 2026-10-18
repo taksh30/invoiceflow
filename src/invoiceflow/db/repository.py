@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from datetime import date
 from decimal import Decimal
 
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, delete, func, or_, select
 from sqlalchemy.orm import Session
 
 from invoiceflow.db.tables import DocumentRow, InvoiceRow, ProcessingEventRow
@@ -144,3 +144,45 @@ class InvoiceRepository:
         self.session.add(event)
         self.session.flush()
         return event
+
+    def get_document_by_id(self, doc_id: int) -> DocumentRow | None:
+        """Find a document by its primary key ID."""
+        return self.session.get(DocumentRow, doc_id)
+
+    def get_invoice_by_document_id(self, doc_id: int) -> InvoiceRow | None:
+        """Find the invoice associated with a document ID."""
+        stmt = select(InvoiceRow).where(InvoiceRow.document_id == doc_id)
+        return self.session.scalars(stmt).first()
+
+    def list_documents(self, status: str | None = None) -> Sequence[DocumentRow]:
+        """List documents optionally filtered by processing status."""
+        stmt = select(DocumentRow).order_by(DocumentRow.id.desc())
+        if status:
+            stmt = stmt.where(DocumentRow.status == status)
+        return self.session.scalars(stmt).all()
+
+    def list_events_by_document_id(self, doc_id: int) -> Sequence[ProcessingEventRow]:
+        """List audit event logs for a specific document ID ordered chronologically."""
+        stmt = (
+            select(ProcessingEventRow)
+            .where(ProcessingEventRow.document_id == doc_id)
+            .order_by(ProcessingEventRow.created_at.asc())
+        )
+        return self.session.scalars(stmt).all()
+
+    def update_document_status(
+        self, doc_id: int, status: str, error: str | None = None
+    ) -> DocumentRow | None:
+        """Update processing status and error message on a document."""
+        doc = self.get_document_by_id(doc_id)
+        if doc:
+            doc.status = status
+            doc.error = error
+            self.session.flush()
+        return doc
+
+    def delete_invoice_by_document_id(self, doc_id: int) -> None:
+        """Delete invoice records associated with a document ID."""
+        stmt = delete(InvoiceRow).where(InvoiceRow.document_id == doc_id)
+        self.session.execute(stmt)
+        self.session.flush()

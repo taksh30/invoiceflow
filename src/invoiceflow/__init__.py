@@ -6,11 +6,14 @@ from invoiceflow.dedupe import (
     normalize_vendor,
     vendor_similarity,
 )
+from invoiceflow.pipeline import Pipeline, PipelineResult
 from invoiceflow.validate import ValidationResult, build_and_validate, validate_invoice
 
 __version__ = "0.1.0"
 __all__ = [
     "DeduplicationResult",
+    "Pipeline",
+    "PipelineResult",
     "ValidationResult",
     "build_and_validate",
     "find_duplicate",
