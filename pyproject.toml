@@ -58,6 +58,17 @@ warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 
+[[tool.mypy.overrides]]
+module = [
+    "pdfplumber",
+    "pdfplumber.*",
+    "pytesseract",
+    "pypdfium2",
+    "PIL",
+    "PIL.*",
+]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 minversion = "8.0"
 addopts = "-ra -q --strict-markers"
