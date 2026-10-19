@@ -3,7 +3,7 @@
 import re
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 import yaml
 
@@ -26,6 +26,7 @@ def _load_rules() -> dict[str, Any]:
 _RULES = _load_rules()
 
 
+@runtime_checkable
 class FieldExtractor(Protocol):
     """Protocol defining the standard field extractor interface."""
 

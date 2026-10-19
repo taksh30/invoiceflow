@@ -11,6 +11,7 @@ from invoiceflow.db.tables import DocumentRow, InvoiceRow
 from invoiceflow.dedupe import find_duplicate
 from invoiceflow.extract.classify import classify_document
 from invoiceflow.extract.fields import InvoiceFieldsExtractor
+from invoiceflow.extract.llm import LLMExtractor
 from invoiceflow.extract.text import extract_text
 from invoiceflow.models import (
     DocumentSource,
@@ -43,6 +44,9 @@ class Pipeline:
         session: Session,
         raw_storage_dir: Path | str = "data/raw",
         default_locale: str = "IN",
+        llm_extractor: LLMExtractor | None = None,
+        llm_enabled: bool = False,
+        llm_confidence_threshold: float = 0.6,
     ) -> None:
         """Initialize pipeline with database session and configuration."""
         self.session = session
@@ -51,6 +55,9 @@ class Pipeline:
         self.raw_storage_dir.mkdir(parents=True, exist_ok=True)
         self.extractor = InvoiceFieldsExtractor()
         self.default_locale = default_locale
+        self.llm_extractor = llm_extractor
+        self.llm_enabled = llm_enabled
+        self.llm_confidence_threshold = llm_confidence_threshold
 
     def _detect_locale(self, filename: str) -> str:
         """Infer country locale from filename heuristic or fallback to default."""
@@ -101,6 +108,42 @@ class Pipeline:
         self.session.commit()
         return final_status, is_dup, inv_row
 
+    def _run_llm_fallback(
+        self,
+        doc_id: int,
+        raw_text: str,
+        current_invoice: ExtractedInvoice,
+        locale: str,
+    ) -> ExtractedInvoice:
+        """Execute LLM fallback extraction when confidence is below threshold."""
+        if not self.llm_extractor:
+            return current_invoice
+        try:
+            llm_invoice = self.llm_extractor.extract_invoice(raw_text, locale=locale)
+            if llm_invoice is not None:
+                self.repo.log_event(
+                    doc_id,
+                    "llm_fallback",
+                    f"LLM fallback triggered (prior confidence was "
+                    f"{current_invoice.overall_confidence:.2f}): "
+                    f"vendor='{llm_invoice.vendor_name}', total={llm_invoice.total}",
+                )
+                return llm_invoice
+            self.repo.log_event(
+                doc_id,
+                "llm_fallback",
+                "LLM fallback extraction returned no result",
+                level="WARNING",
+            )
+        except Exception as exc:
+            self.repo.log_event(
+                doc_id,
+                "llm_fallback",
+                f"LLM fallback failed: {exc}",
+                level="WARNING",
+            )
+        return current_invoice
+
     def _process_pipeline_stages(self, doc: DocumentRow, stored_path: Path) -> PipelineResult:
         """Execute extraction, validation, and deduplication with per-document error isolation."""
         try:
@@ -115,6 +158,15 @@ class Pipeline:
                 "extract_fields",
                 f"Extracted vendor='{extracted_inv.vendor_name}', total={extracted_inv.total}",
             )
+
+            if (
+                self.llm_enabled
+                and self.llm_extractor is not None
+                and extracted_inv.overall_confidence < self.llm_confidence_threshold
+            ):
+                extracted_inv = self._run_llm_fallback(
+                    doc.id, text_res.raw_text, extracted_inv, locale
+                )
 
             val_res = validate_invoice(extracted_inv)
             self.repo.log_event(doc.id, "validate", f"Validation status={val_res.status.value}")

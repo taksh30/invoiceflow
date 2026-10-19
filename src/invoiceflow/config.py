@@ -1,5 +1,6 @@
 """Application configuration management using pydantic-settings."""
 
+from decimal import Decimal
 from pathlib import Path
 
 from pydantic import Field
@@ -42,6 +43,20 @@ class Settings(BaseSettings):
     )
     google_sheets_spreadsheet_id: str | None = Field(
         default=None, description="Target Google Sheets spreadsheet ID"
+    )
+
+    llm_enabled: bool = Field(default=False, description="Enable LLM extraction fallback")
+    llm_provider: str = Field(default="fake", description="LLM provider: fake, openai, etc.")
+    llm_model: str = Field(default="gpt-4o-mini", description="Target LLM model name")
+    llm_timeout: float = Field(default=30.0, description="Timeout in seconds for LLM calls")
+    llm_confidence_threshold: float = Field(
+        default=0.6, description="Confidence threshold under which LLM fallback is triggered"
+    )
+    llm_cost_per_1k_input: Decimal = Field(
+        default=Decimal("0.00015"), description="Cost in USD per 1k input tokens"
+    )
+    llm_cost_per_1k_output: Decimal = Field(
+        default=Decimal("0.0006"), description="Cost in USD per 1k output tokens"
     )
 
     def ensure_directories(self) -> None:

@@ -52,10 +52,27 @@ def _get_pipeline(locale: str = "IN") -> tuple[Pipeline, InvoiceRepository, Any]
     init_db(engine)
     session = get_session_factory(engine)()
     repo = InvoiceRepository(session)
+
+    llm_extractor = None
+    if settings.llm_enabled:
+        from invoiceflow.extract.llm import FakeLLMClient, LLMExtractor
+
+        client = FakeLLMClient(model=settings.llm_model)
+        llm_extractor = LLMExtractor(
+            client=client,
+            timeout=settings.llm_timeout,
+            model=settings.llm_model,
+            cost_per_1k_input=settings.llm_cost_per_1k_input,
+            cost_per_1k_output=settings.llm_cost_per_1k_output,
+        )
+
     pipeline = Pipeline(
         session=session,
         raw_storage_dir=settings.raw_dir,
         default_locale=locale or settings.default_locale,
+        llm_extractor=llm_extractor,
+        llm_enabled=settings.llm_enabled,
+        llm_confidence_threshold=settings.llm_confidence_threshold,
     )
     return pipeline, repo, session
 

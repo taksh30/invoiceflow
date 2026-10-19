@@ -13,6 +13,12 @@ from invoiceflow.extract.fields import (
     VendorNameExtractor,
     VendorTaxIdExtractor,
 )
+from invoiceflow.extract.llm import (
+    FakeLLMClient,
+    LLMClient,
+    LLMExtractor,
+    LLMResponse,
+)
 from invoiceflow.extract.text import (
     TextResult,
     WordBox,
@@ -42,4 +48,8 @@ __all__ = [
     "VendorTaxIdExtractor",
     "CurrencyExtractor",
     "InvoiceFieldsExtractor",
+    "LLMClient",
+    "FakeLLMClient",
+    "LLMExtractor",
+    "LLMResponse",
 ]

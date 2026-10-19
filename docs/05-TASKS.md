@@ -15,7 +15,7 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [x] P10 Email (IMAP) source
 - [x] P11 Exports (CSV/XLSX + Google Sheets)
 - [x] P12 Hardening (retries, logging, Docker, CI, README)
-- [ ] P13 Advanced (LLM fallback, review UI, Tally/QuickBooks, Postgres)
+- [~] P13 Advanced (P13a LLM fallback done; review UI, Tally/QuickBooks, Postgres)
 
 ## Current phase
 P13
@@ -33,7 +33,8 @@ P13
 - P10 complete: Implemented ImapEmailSource (SSL connection, UNSEEN message search, RFC 2047 attachment decoding, \\Seen marking, local seen-UID tracking, and tenacity connection retries) and Typer CLI command poll-email. Added 12 unit tests with mocked IMAP server. 115 tests passing, all linters clean.
 - P11 complete: Implemented export/csv_xlsx.py (multi-sheet Excel workbook with Invoices and Vendor Summary, and CSV export via pandas) and export/sheets.py (Google Sheets append via Service Account, idempotent by invoice ID with tenacity retries). Added Typer CLI command export and 14 unit tests. 129 tests passing, all linters clean.
 - P12 complete: Implemented structured dynamic JSON logging and CLI options (--json-log, --log-level), created Dockerfile (Tesseract OCR, Poppler, non-root appuser), docker-compose.yml (app + PostgreSQL), GitHub Actions CI (.github/workflows/ci.yml), comprehensive README.md with Mermaid architecture and limitations, and verified PostgreSQL compatibility with psycopg via DATABASE_URL switching. 138 tests passing, all linters clean.
-- Next: P13 Advanced (LLM fallback, review UI, Tally/QuickBooks, Postgres).
+- P13a complete: Implemented LLMExtractor conforming to FieldExtractor with provider-agnostic LLMClient protocol, FakeLLMClient for testing, strict JSON schema output, timeout enforcement, token cost calculation, and structured logging. Integrated LLM fallback into Pipeline when overall_confidence < 0.6 and llm_enabled=True, with per-document error isolation. 149 tests passing, all linters clean.
+- Next: P13 remaining features (review UI, accounting integrations).
 
 ## Open Questions / Decisions
 (none yet)
