@@ -15,10 +15,10 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [x] P10 Email (IMAP) source
 - [x] P11 Exports (CSV/XLSX + Google Sheets)
 - [x] P12 Hardening (retries, logging, Docker, CI, README)
-- [~] P13 Advanced (P13a LLM fallback done; P13b Review UI done; Tally/QuickBooks)
+- [x] P13 Advanced (P13a LLM fallback; P13b Review UI; P13c Accounting exports)
 
 ## Current phase
-P13
+Complete (All phases P1-P13 implemented)
 
 ## Session Log
 - P1 complete: Configured project tooling, pyproject.toml, .gitignore, .env.example, config.py, utils/logging.py, errors.py, empty Typer CLI, .pre-commit-config.yaml, and smoke/unit tests (10/10 passing, 95% coverage).
@@ -35,7 +35,7 @@ P13
 - P12 complete: Implemented structured dynamic JSON logging and CLI options (--json-log, --log-level), created Dockerfile (Tesseract OCR, Poppler, non-root appuser), docker-compose.yml (app + PostgreSQL), GitHub Actions CI (.github/workflows/ci.yml), comprehensive README.md with Mermaid architecture and limitations, and verified PostgreSQL compatibility with psycopg via DATABASE_URL switching. 138 tests passing, all linters clean.
 - P13a complete: Implemented LLMExtractor conforming to FieldExtractor with provider-agnostic LLMClient protocol, FakeLLMClient for testing, strict JSON schema output, timeout enforcement, token cost calculation, and structured logging. Integrated LLM fallback into Pipeline when overall_confidence < 0.6 and llm_enabled=True, with per-document error isolation. 149 tests passing, all linters clean.
 - P13b complete: Implemented FastAPI + HTMX Review Station app (ui/app.py, ui/templates.py, ui/corrections.py) with needs_review queue, side-by-side document preview (PDF/image streaming), editable field corrections, promotion to processed status, and persistent training example storage in corrections.jsonl. Added Typer 'invoiceflow ui' CLI command. 154 tests passing, all linters clean.
-- Next: P13 remaining features (accounting exports/integrations).
+- P13c complete: Implemented accounting exports (export/tally.py and export/quickbooks.py) supporting Tally ERP/Prime XML Purchase vouchers with balanced zero-sum debit/credit ledgers, QuickBooks IIF tab-delimited files, and QuickBooks bill import CSVs. Integrated mapping configs (TallyMappingConfig, QuickBooksMappingConfig) and updated CLI export command. 160 tests passing, all linters clean.
 
 ## Open Questions / Decisions
 (none yet)

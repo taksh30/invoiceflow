@@ -14,7 +14,13 @@ from invoiceflow.config import Settings
 from invoiceflow.db.base import create_db_engine, get_session_factory, init_db
 from invoiceflow.db.repository import InvoiceRepository
 from invoiceflow.db.tables import DocumentRow, InvoiceRow, ProcessingEventRow
-from invoiceflow.export import GoogleSheetsExporter, export_monthly_data
+from invoiceflow.export import (
+    GoogleSheetsExporter,
+    export_monthly_data,
+    export_quickbooks_csv,
+    export_quickbooks_iif,
+    export_tally_xml,
+)
 from invoiceflow.pipeline import Pipeline, PipelineResult
 from invoiceflow.sources.email_imap import ImapEmailSource
 from invoiceflow.sources.folder import FolderSource
@@ -310,6 +316,51 @@ def reprocess_command(
         session.close()
 
 
+def _sync_google_sheets(settings: Settings, invoices: Sequence[InvoiceRow]) -> int:
+    """Synchronize invoices to Google Sheets, raising typer.Exit on missing config."""
+    if (
+        settings.google_sheets_spreadsheet_id is None
+        or settings.google_service_account_file is None
+    ):
+        console.print(
+            "[red]Error:[/red] Missing Google Sheets configuration. Configure "
+            "INVOICEFLOW_GOOGLE_SHEETS_SPREADSHEET_ID and "
+            "INVOICEFLOW_GOOGLE_SERVICE_ACCOUNT_FILE."
+        )
+        raise typer.Exit(code=1)
+
+    exporter = GoogleSheetsExporter(
+        spreadsheet_id=settings.google_sheets_spreadsheet_id,
+        service_account_file=settings.google_service_account_file,
+    )
+    return exporter.sync_invoices(invoices)
+
+
+def _resolve_dest_path(fmt: str, output: Path | None, dest_dir: Path, year: int, mon: int) -> Path:
+    """Determine output destination path for file-based exports."""
+    if output:
+        return output
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    ext_map = {"csv": "csv", "xlsx": "xlsx", "tally": "xml", "qb-iif": "iif", "qb-csv": "qb.csv"}
+    ext = ext_map.get(fmt, fmt)
+    return dest_dir / f"invoices_{year}_{mon:02d}.{ext}"
+
+
+def _export_to_file(fmt: str, invoices: Sequence[InvoiceRow], dest_path: Path) -> Path:
+    """Dispatch file-based export generation to the appropriate exporter."""
+    if fmt in {"csv", "xlsx"}:
+        return export_monthly_data(
+            invoices,
+            dest_path,
+            export_format=fmt,  # type: ignore[arg-type]
+        )
+    if fmt == "tally":
+        return export_tally_xml(invoices, dest_path)
+    if fmt == "qb-iif":
+        return export_quickbooks_iif(invoices, dest_path)
+    return export_quickbooks_csv(invoices, dest_path)
+
+
 @app.command(name="export")
 def export_command(
     month: Annotated[
@@ -318,66 +369,49 @@ def export_command(
     ],
     format: Annotated[
         str,
-        typer.Option("--format", "-f", help="Export format: csv, xlsx, or sheets"),
+        typer.Option(
+            "--format",
+            "-f",
+            help="Export format: csv, xlsx, sheets, tally, qb-iif, or qb-csv",
+        ),
     ] = "xlsx",
     output: Annotated[
         Path | None,
         typer.Option("--output", "-o", help="Optional output destination file path"),
     ] = None,
 ) -> None:
-    """Export monthly invoices to CSV, Excel, or synchronize with Google Sheets."""
+    """Export monthly invoices to CSV, Excel, Tally XML, QuickBooks, or Google Sheets."""
     m_match = re.match(r"^(\d{4})-(0[1-9]|1[0-2])$", month.strip())
     if not m_match:
         console.print("[red]Error:[/red] Invalid month format. Expected YYYY-MM (e.g. 2024-05).")
         raise typer.Exit(code=1)
 
     fmt = format.lower().strip()
-    if fmt not in {"csv", "xlsx", "sheets"}:
+    valid_formats = {"csv", "xlsx", "sheets", "tally", "qb-iif", "qb-csv"}
+    if fmt not in valid_formats:
         console.print(
-            f"[red]Error:[/red] Unsupported format '{format}'. Choose csv, xlsx, or sheets."
+            f"[red]Error:[/red] Unsupported format '{format}'. Choose one of: "
+            f"{', '.join(sorted(valid_formats))}."
         )
         raise typer.Exit(code=1)
 
-    year = int(m_match.group(1))
-    mon = int(m_match.group(2))
-
+    year, mon = int(m_match.group(1)), int(m_match.group(2))
     _, repo, session = _get_pipeline()
     settings = Settings()
     try:
         invoices = repo.list_by_month(year, mon)
-        if fmt in {"csv", "xlsx"}:
-            dest_dir = settings.export_dir
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            dest_path = output or (dest_dir / f"invoices_{year}_{mon:02d}.{fmt}")
-            res_path = export_monthly_data(
-                invoices,
-                dest_path,
-                export_format=fmt,  # type: ignore[arg-type]
-            )
-            console.print(
-                f"[bold green]Successfully exported {len(invoices)} invoices to:[/bold green] "
-                f"{res_path}"
-            )
-        elif fmt == "sheets":
-            if (
-                settings.google_sheets_spreadsheet_id is None
-                or settings.google_service_account_file is None
-            ):
-                console.print(
-                    "[red]Error:[/red] Missing Google Sheets configuration. Configure "
-                    "INVOICEFLOW_GOOGLE_SHEETS_SPREADSHEET_ID and "
-                    "INVOICEFLOW_GOOGLE_SERVICE_ACCOUNT_FILE."
-                )
-                raise typer.Exit(code=1)
-
-            exporter = GoogleSheetsExporter(
-                spreadsheet_id=settings.google_sheets_spreadsheet_id,
-                service_account_file=settings.google_service_account_file,
-            )
-            count = exporter.sync_invoices(invoices)
+        if fmt == "sheets":
+            count = _sync_google_sheets(settings, invoices)
             console.print(
                 f"[bold green]Successfully synced {count} new invoices to Google Sheets "
                 f"(Total eligible: {len(invoices)}).[/bold green]"
+            )
+        else:
+            dest = _resolve_dest_path(fmt, output, settings.export_dir, year, mon)
+            res_path = _export_to_file(fmt, invoices, dest)
+            console.print(
+                f"[bold green]Successfully exported {len(invoices)} invoices to:[/bold green] "
+                f"{res_path}"
             )
     finally:
         session.close()

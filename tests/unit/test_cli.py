@@ -246,3 +246,24 @@ def test_cli_export_sheets(cli_env: Path, monkeypatch: pytest.MonkeyPatch) -> No
 
     assert res_sync.exit_code == 0
     assert "Successfully synced 1 new invoices to Google Sheets" in res_sync.output
+
+
+def test_cli_export_accounting_formats(cli_env: Path) -> None:
+    """Verify exporting monthly records to Tally XML, QuickBooks IIF, and CSV via CLI."""
+    sample_file = FIXTURES_DIR / "inv_in_01.pdf"
+    runner.invoke(app, ["process", str(sample_file)])
+
+    res_tally = runner.invoke(app, ["export", "--month", "2024-05", "--format", "tally"])
+    assert res_tally.exit_code == 0
+    assert "Successfully exported 1 invoices" in res_tally.output
+    assert ".xml" in res_tally.output
+
+    res_iif = runner.invoke(app, ["export", "--month", "2024-05", "--format", "qb-iif"])
+    assert res_iif.exit_code == 0
+    assert "Successfully exported 1 invoices" in res_iif.output
+    assert ".iif" in res_iif.output
+
+    res_qb_csv = runner.invoke(app, ["export", "--month", "2024-05", "--format", "qb-csv"])
+    assert res_qb_csv.exit_code == 0
+    assert "Successfully exported 1 invoices" in res_qb_csv.output
+    assert ".csv" in res_qb_csv.output
