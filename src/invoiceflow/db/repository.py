@@ -78,6 +78,31 @@ class InvoiceRepository:
         self.session.flush()
         return row
 
+    def update_invoice(
+        self,
+        document_id: int,
+        invoice: ExtractedInvoice,
+    ) -> InvoiceRow:
+        """Update existing invoice fields or create a new row if absent."""
+        row = self.get_invoice_by_document_id(document_id)
+        if not row:
+            return self.add_invoice(document_id, invoice)
+        row.vendor_name = invoice.vendor_name
+        row.vendor_tax_id = invoice.vendor_tax_id
+        row.invoice_number = invoice.invoice_number
+        row.invoice_date = invoice.invoice_date
+        row.currency = invoice.currency
+        row.subtotal = invoice.subtotal
+        row.tax_total = invoice.tax_total
+        row.cgst = invoice.cgst
+        row.sgst = invoice.sgst
+        row.igst = invoice.igst
+        row.total = invoice.total
+        row.confidence = invoice.confidence
+        row.overall_confidence = invoice.overall_confidence
+        self.session.flush()
+        return row
+
     def find_candidates(
         self,
         vendor_name: str | None = None,

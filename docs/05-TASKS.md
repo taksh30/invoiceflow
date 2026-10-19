@@ -15,7 +15,7 @@ Legend: [ ] todo  [~] in progress  [x] done
 - [x] P10 Email (IMAP) source
 - [x] P11 Exports (CSV/XLSX + Google Sheets)
 - [x] P12 Hardening (retries, logging, Docker, CI, README)
-- [~] P13 Advanced (P13a LLM fallback done; review UI, Tally/QuickBooks, Postgres)
+- [~] P13 Advanced (P13a LLM fallback done; P13b Review UI done; Tally/QuickBooks)
 
 ## Current phase
 P13
@@ -34,7 +34,8 @@ P13
 - P11 complete: Implemented export/csv_xlsx.py (multi-sheet Excel workbook with Invoices and Vendor Summary, and CSV export via pandas) and export/sheets.py (Google Sheets append via Service Account, idempotent by invoice ID with tenacity retries). Added Typer CLI command export and 14 unit tests. 129 tests passing, all linters clean.
 - P12 complete: Implemented structured dynamic JSON logging and CLI options (--json-log, --log-level), created Dockerfile (Tesseract OCR, Poppler, non-root appuser), docker-compose.yml (app + PostgreSQL), GitHub Actions CI (.github/workflows/ci.yml), comprehensive README.md with Mermaid architecture and limitations, and verified PostgreSQL compatibility with psycopg via DATABASE_URL switching. 138 tests passing, all linters clean.
 - P13a complete: Implemented LLMExtractor conforming to FieldExtractor with provider-agnostic LLMClient protocol, FakeLLMClient for testing, strict JSON schema output, timeout enforcement, token cost calculation, and structured logging. Integrated LLM fallback into Pipeline when overall_confidence < 0.6 and llm_enabled=True, with per-document error isolation. 149 tests passing, all linters clean.
-- Next: P13 remaining features (review UI, accounting integrations).
+- P13b complete: Implemented FastAPI + HTMX Review Station app (ui/app.py, ui/templates.py, ui/corrections.py) with needs_review queue, side-by-side document preview (PDF/image streaming), editable field corrections, promotion to processed status, and persistent training example storage in corrections.jsonl. Added Typer 'invoiceflow ui' CLI command. 154 tests passing, all linters clean.
+- Next: P13 remaining features (accounting exports/integrations).
 
 ## Open Questions / Decisions
 (none yet)

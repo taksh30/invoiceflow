@@ -59,8 +59,13 @@ class Settings(BaseSettings):
         default=Decimal("0.0006"), description="Cost in USD per 1k output tokens"
     )
 
+    corrections_dir: Path = Field(
+        default=Path("data/corrections"), description="Directory for user corrections"
+    )
+
     def ensure_directories(self) -> None:
         """Create necessary data storage directories if they do not exist."""
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.raw_dir.mkdir(parents=True, exist_ok=True)
         self.export_dir.mkdir(parents=True, exist_ok=True)
+        self.corrections_dir.mkdir(parents=True, exist_ok=True)

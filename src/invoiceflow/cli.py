@@ -383,5 +383,32 @@ def export_command(
         session.close()
 
 
+@app.command()
+def ui(
+    host: Annotated[
+        str, typer.Option("--host", help="Host address to bind the review web server")
+    ] = "127.0.0.1",
+    port: Annotated[int, typer.Option("--port", help="Port to bind the review web server")] = 8000,
+    reload: Annotated[
+        bool, typer.Option("--reload", help="Enable auto-reload for development")
+    ] = False,
+) -> None:
+    """Launch the FastAPI + HTMX human review web application."""
+    import uvicorn
+
+    from invoiceflow.ui.app import create_ui_app
+
+    console.print(
+        Panel(
+            f"[bold green]Starting InvoiceFlow Review Station[/bold green]\n"
+            f"URL: [link=http://{host}:{port}]http://{host}:{port}[/link]\n"
+            f"Review flagged invoices and submit human corrections.",
+            title="InvoiceFlow Web UI",
+        )
+    )
+    ui_app = create_ui_app()
+    uvicorn.run(ui_app, host=host, port=port, reload=reload)
+
+
 if __name__ == "__main__":
     app()

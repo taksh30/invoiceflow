@@ -39,6 +39,7 @@ def test_cli_help() -> None:
     assert "list" in res.output
     assert "show" in res.output
     assert "reprocess" in res.output
+    assert "ui" in res.output
 
 
 def test_cli_json_log_option(cli_env: Path) -> None:
