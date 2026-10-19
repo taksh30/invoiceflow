@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: invoiceflow-app
+    restart: unless-stopped
+    environment:
+      - INVOICEFLOW_DATABASE_URL=${INVOICEFLOW_DATABASE_URL:-sqlite:////app/data/invoiceflow.db}
+      - INVOICEFLOW_LOG_LEVEL=${INVOICEFLOW_LOG_LEVEL:-INFO}
+      - INVOICEFLOW_LOG_JSON=${INVOICEFLOW_LOG_JSON:-false}
+      - INVOICEFLOW_DEFAULT_CURRENCY=${INVOICEFLOW_DEFAULT_CURRENCY:-INR}
+      - INVOICEFLOW_DEFAULT_LOCALE=${INVOICEFLOW_DEFAULT_LOCALE:-IN}
+    volumes:
+      - ./data:/app/data
+      - ./watch_folder:/app/watch_folder
+    command: ["--help"]
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: invoiceflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-invoiceflow}
+      POSTGRES_USER: ${POSTGRES_USER:-invoiceflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-invoiceflow}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoiceflow -d invoiceflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

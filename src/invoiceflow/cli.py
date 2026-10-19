@@ -18,6 +18,7 @@ from invoiceflow.export import GoogleSheetsExporter, export_monthly_data
 from invoiceflow.pipeline import Pipeline, PipelineResult
 from invoiceflow.sources.email_imap import ImapEmailSource
 from invoiceflow.sources.folder import FolderSource
+from invoiceflow.utils.logging import setup_logging
 
 app = typer.Typer(
     name="invoiceflow",
@@ -25,6 +26,22 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 console = Console(width=120)
+
+
+@app.callback()
+def main(
+    json_log: bool = typer.Option(
+        False, "--json-log", help="Format log output as single-line JSON objects"
+    ),
+    log_level: str | None = typer.Option(
+        None, "--log-level", help="Application logging level (DEBUG, INFO, WARNING, ERROR)"
+    ),
+) -> None:
+    """InvoiceFlow root CLI entry point configuring global runtime options."""
+    settings = Settings()
+    effective_level = log_level or settings.log_level
+    effective_json = json_log or settings.log_json
+    setup_logging(level=effective_level, json_format=effective_json)
 
 
 def _get_pipeline(locale: str = "IN") -> tuple[Pipeline, InvoiceRepository, Any]:
@@ -347,11 +364,6 @@ def export_command(
             )
     finally:
         session.close()
-
-
-@app.callback()
-def main() -> None:
-    """InvoiceFlow root CLI callback."""
 
 
 if __name__ == "__main__":

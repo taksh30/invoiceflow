@@ -32,11 +32,27 @@ def test_cli_help() -> None:
     res = runner.invoke(app, ["--help"])
     assert res.exit_code == 0
     assert "InvoiceFlow: Automated invoice and receipt auto-processor" in res.output
+    assert "--json-log" in res.output
+    assert "--log-level" in res.output
     assert "process" in res.output
     assert "watch" in res.output
     assert "list" in res.output
     assert "show" in res.output
     assert "reprocess" in res.output
+
+
+def test_cli_json_log_option(cli_env: Path) -> None:
+    """Verify --json-log flag configures JSONFormatter on root logger."""
+    import logging
+
+    from invoiceflow.utils.logging import JSONFormatter
+
+    res = runner.invoke(app, ["--json-log", "list"])
+    assert res.exit_code == 0
+    root = logging.getLogger()
+    handlers = [h for h in root.handlers if h.__class__.__name__ != "LogCaptureHandler"]
+    assert handlers
+    assert isinstance(handlers[0].formatter, JSONFormatter)
 
 
 def test_cli_process_single_file(cli_env: Path) -> None:

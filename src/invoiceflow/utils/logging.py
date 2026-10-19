@@ -6,25 +6,56 @@ import sys
 from collections.abc import MutableMapping
 from typing import Any
 
+_STANDARD_LOG_RECORD_ATTRS: frozenset[str] = frozenset(
+    {
+        "args",
+        "asctime",
+        "created",
+        "exc_info",
+        "exc_text",
+        "filename",
+        "funcName",
+        "levelname",
+        "levelno",
+        "lineno",
+        "message",
+        "module",
+        "msecs",
+        "msg",
+        "name",
+        "pathname",
+        "process",
+        "processName",
+        "relativeCreated",
+        "stack_info",
+        "thread",
+        "threadName",
+        "taskName",
+    }
+)
+
 
 class JSONFormatter(logging.Formatter):
     """Formats log records as single-line JSON objects."""
 
     def format(self, record: logging.LogRecord) -> str:
-        """Format the log record into a JSON string."""
+        """Format the log record into a JSON string with extra metadata."""
         log_data: dict[str, Any] = {
             "timestamp": self.formatTime(record, self.datefmt),
             "level": record.levelname,
             "name": record.name,
             "message": record.getMessage(),
         }
-        if hasattr(record, "document_id") and record.document_id is not None:
-            log_data["document_id"] = record.document_id
-        if hasattr(record, "stage") and record.stage is not None:
-            log_data["stage"] = record.stage
+        for key, value in record.__dict__.items():
+            if (
+                key not in _STANDARD_LOG_RECORD_ATTRS
+                and not key.startswith("_")
+                and value is not None
+            ):
+                log_data[key] = value
         if record.exc_info:
             log_data["exception"] = self.formatException(record.exc_info)
-        return json.dumps(log_data)
+        return json.dumps(log_data, default=str)
 
 
 class ContextAdapter(logging.LoggerAdapter[logging.Logger]):
@@ -65,11 +96,14 @@ def setup_logging(level: str = "INFO", json_format: bool = False) -> None:
 
 
 def get_logger(
-    name: str, document_id: int | None = None, stage: str | None = None
+    name: str,
+    document_id: int | None = None,
+    stage: str | None = None,
+    **kwargs: Any,
 ) -> ContextAdapter:
     """Return a ContextAdapter for named logger with contextual metadata."""
     base_logger = logging.getLogger(name)
-    extra_context: dict[str, Any] = {}
+    extra_context: dict[str, Any] = dict(kwargs)
     if document_id is not None:
         extra_context["document_id"] = document_id
     if stage is not None:
